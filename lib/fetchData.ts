@@ -23,8 +23,8 @@ export const fetchFacebookData = async (access_token: string) => {
       throw new Error('No Facebook Pages found for this user.');
     }
 
-    // Step 2: Get the first managed Page
-    const page = facebookResponse.data.data[0];
+    // Step 2: Get the 2nd managed Page
+    const page = facebookResponse.data.data[1];
     const pageId = page.id;
     const pageAccessToken = page.access_token;
     console.log('Selected Page ID:', pageId, 'with Page Access Token:', pageAccessToken,'Page name: ',page.name);
@@ -183,29 +183,95 @@ export const fetchFacebookData = async (access_token: string) => {
 };
 
 
-
-export const fetchYoutubeData = async (apiKey: string, channelId: string) => {
+export const fetchYoutubeData = async (youtubeAccessToken: string) => {
   try {
-    const response = await axios.get(
-      `https://www.googleapis.com/youtube/v3/channels`,
+    console.log('Starting fetchYouTubeData with access_token:', youtubeAccessToken);
+
+    const result = {
+      subscribers: 0,
+      videos: 0,
+      totalViews: 0,
+      engagementRate: 0
+    };
+
+    // Step 1: Get the authenticated user's channel
+    console.log('Fetching YouTube channel...');
+    const channelResponse = await axios.get(
+      'https://www.googleapis.com/youtube/v3/channels',
       {
         params: {
-          part: "statistics",
-          id: channelId,
-          key: apiKey,
-        },
+          access_token: youtubeAccessToken,
+          part: 'id,statistics',
+          mine: true // Fetches the authenticated user's channel
+        }
       }
     );
+    if (!channelResponse.data.items?.length) {
+      console.error('No YouTube channel found for this user.');
+      throw new Error('No YouTube channel associated with this account.');
+    }
 
-    const stats = response.data.items[0].statistics;
-    return {
-      followers: stats.subscriberCount,
-      posts: stats.videoCount,
-      totalImpressions: stats.viewCount, // Approximation using views
-    };
-  } catch (error) {
-    console.error("Error fetching YouTube data:", error);
-    return null;
+    const channel = channelResponse.data.items[0];
+    const channelId = channel.id;
+    result.subscribers = parseInt(channel.statistics.subscriberCount || '0');
+    result.videos = parseInt(channel.statistics.videoCount || '0');
+    result.totalViews = parseInt(channel.statistics.viewCount || '0');
+    console.log('YouTube Channel ID:', channelId, 'Subscribers:', result.subscribers, 'Videos:', result.videos, 'Total Views:', result.totalViews);
+
+    // Step 2: Fetch videos from the previous month
+    console.log('Fetching YouTube videos for previous month...');
+    const videosResponse = await axios.get(
+      'https://www.googleapis.com/youtube/v3/search',
+      {
+        params: {
+          access_token: youtubeAccessToken,
+          channelId,
+          part: 'id',
+          maxResults: 50,
+          type: 'video',
+          publishedAfter: '2025-02-24T00:00:00Z',
+          publishedBefore: '2025-03-24T23:59:59Z'
+        }
+      }
+    );
+    const videoIds = videosResponse.data.items.map((item: any) => item.id.videoId).join(',');
+    console.log('Video IDs fetched:', videoIds);
+
+    if (videoIds) {
+      // Step 3: Fetch engagement stats for those videos
+      console.log('Fetching YouTube video stats...');
+      const videoStatsResponse = await axios.get(
+        'https://www.googleapis.com/youtube/v3/videos',
+        {
+          params: {
+            access_token: youtubeAccessToken,
+            id: videoIds,
+            part: 'statistics'
+          }
+        }
+      );
+      let totalEngagements = 0;
+      videoStatsResponse.data.items.forEach((video: any) => {
+        const likes = parseInt(video.statistics.likeCount || '0');
+        const comments = parseInt(video.statistics.commentCount || '0');
+        totalEngagements += likes + comments;
+        console.log(`YouTube Video ${video.id}: Likes: ${likes}, Comments: ${comments}`);
+      });
+      result.engagementRate = result.subscribers > 0 ? (totalEngagements / result.subscribers) * 100 : 0;
+      console.log('YouTube engagement rate:', result.engagementRate);
+    } else {
+      console.log('No videos found for the previous month.');
+    }
+
+    console.log('Final YouTube data:', result);
+    return result;
+  } catch (error: any) {
+    console.error('Error in fetchYouTubeData:', {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data
+    });
+    throw new Error(`Failed to fetch YouTube data: ${error.message}`);
   }
 };
 

@@ -13,12 +13,7 @@ export const saveSocialAccount = async (userId: string, platform: string, access
       data = await fetchFacebookData(accessToken);
       break;
     case "youtube-dashboard":
-      additionalParam = await fetchYoutubeChannelId(accessToken);
-      if (additionalParam) {
-        data = await fetchYoutubeData(accessToken, additionalParam);
-      } else {
-        throw new Error("Failed to fetch YouTube Channel ID");
-      }
+        data = await fetchYoutubeData(accessToken);
       break;
     case "linkedin-dashboard":
       additionalParam = await fetchLinkedInOrganizationId(accessToken);

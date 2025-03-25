@@ -82,12 +82,13 @@ export const authOptions: AuthOptions = {
       },
     }),
     GoogleProvider({
-      id: "youtube-dashboard", // Unique ID for dashboard flow
-      clientId: process.env.YOUTUBE_CLIENT_ID!,
-      clientSecret: process.env.YOUTUBE_CLIENT_SECRET!,
+      id: 'youtube-dashboard', 
+      clientId: process.env.YOUTUBE_CLIENT_ID || '',
+      clientSecret: process.env.YOUTUBE_CLIENT_SECRET || '',
       authorization: {
         params: {
-          scope: "openid email profile https://www.googleapis.com/auth/youtube.readonly", // Additional scopes for dashboard
+          scope: 'openid email profile https://www.googleapis.com/auth/youtube.readonly',
+          prompt: 'consent', 
         },
       },
     }),
@@ -149,7 +150,7 @@ export const authOptions: AuthOptions = {
 
           case "facebook-dashboard":
           case "twitter-dashboard":
-          case "google-dashboard":
+          case "youtube-dashboard":
           case "linkedin-dashboard":
           case "instagram-dashboard":
             console.log("ACCOUNT DATA: ", account)
