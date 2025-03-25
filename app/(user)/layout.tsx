@@ -47,9 +47,9 @@ const Layout = ({ children }: LayoutProps) => {
                 <div className="flex items-center justify-between p-4 border-b">
                     <Link href="/home" className={`flex items-center ${isCollapsed ? 'justify-center' : ''}`}>
                         <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
-                            <span className="text-white font-bold">H</span>
+                            <span className="text-white font-bold">SH</span>
                         </div>
-                        {!isCollapsed && <span className="ml-2 font-semibold">Horizon</span>}
+                        {!isCollapsed && <span className="ml-2 font-semibold">Social Hub</span>}
                     </Link>
                     <button onClick={() => setIsCollapsed(!isCollapsed)} className="p-1 rounded hover:bg-gray-100">
                         <ChevronLeft className={`transform transition-transform ${isCollapsed ? 'rotate-180' : ''}`} size={20} />
@@ -93,7 +93,6 @@ const Layout = ({ children }: LayoutProps) => {
                                             className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
                                             onClick={async () => {
                                                 try {
-                                                    await fetch("http://localhost:8081/api/auth/logout", { method: "POST" }); // ✅ Call backend logout
                                                     await signOut({ callbackUrl: "/login" }); // ✅ Sign out from NextAuth
                                                 } catch (err) {
                                                     console.error("Logout failed:", err);

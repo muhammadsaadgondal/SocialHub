@@ -1,6 +1,6 @@
 "use client"
 
-import { Facebook, Instagram, Linkedin, Trash2, Loader2 } from "lucide-react"
+import { Facebook, Instagram, Linkedin, Twitter, Youtube, Trash2, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import {
@@ -14,8 +14,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { Badge } from "@/components/ui/badge"
 import type { SocialAccount, SocialPlatform } from "@/lib/types"
-import { disconnectSocialAccount } from "@/lib/api"
+import { disconnectSocialAccount } from "@/lib/social-api"
 import { useState } from "react"
 import toast from "react-hot-toast"
 
@@ -50,6 +51,10 @@ export function SocialAccountsList({ accounts, onAccountDisconnected }: SocialAc
         return <Instagram className="h-5 w-5 text-pink-600" />
       case "linkedin":
         return <Linkedin className="h-5 w-5 text-blue-700" />
+      case "twitter":
+        return <Twitter className="h-5 w-5 text-sky-500" />
+      case "youtube":
+        return <Youtube className="h-5 w-5 text-red-600" />
       default:
         return null
     }
@@ -80,6 +85,9 @@ export function SocialAccountsList({ accounts, onAccountDisconnected }: SocialAc
               <div className="font-medium">{getPlatformName(account.platform)}</div>
               <div className="text-sm text-muted-foreground">@{account.username}</div>
             </div>
+            <Badge variant="outline" className="ml-2">
+              {account.followers?.toLocaleString() || "0"} followers
+            </Badge>
           </div>
           <div className="flex items-center gap-4">
             <div className="text-sm text-muted-foreground">Updated {account.lastUpdated}</div>

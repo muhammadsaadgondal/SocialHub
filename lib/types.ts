@@ -103,91 +103,69 @@ export interface Influencer {
   }  
 
 
+  export type SocialPlatform = "facebook" | "instagram" | "linkedin" | "twitter" | "youtube"
 
-  // Social account types
-export type SocialPlatform = "facebook" | "instagram" | "linkedin"
-
-export interface SocialAccount {
-  id: string
-  platform: SocialPlatform
-  username: string
-  connected: boolean
-  lastUpdated: string
-}
-
-// Analytics types
-export interface MetricCard {
-  title: string
-  value: string
-  change: string
-  trend: "up" | "down" | "neutral"
-}
-
-export interface PlatformMetrics {
-  followers: string
-  engagement: string
-  posts: string
-  reach: string
-}
-
-export interface PerformanceData {
-  name: string
-  value: number
-}
-
-export interface AudienceDemographic {
-  ageGroups: { range: string; percentage: number }[]
-  gender: { male: number; female: number; other: number }
-}
-
-export interface TopContent {
-  id: string
-  title: string
-  likes: number
-  comments: number
-  shares: number
-  date: string
-}
-
-export interface PlatformAnalyticsData {
-  metrics: PlatformMetrics
-  postPerformance: PerformanceData[]
-  topContent: TopContent[]
-  demographics: AudienceDemographic
-}
-
-export interface OverviewAnalytics {
-  metrics: {
-    followers: MetricCard
-    engagement: MetricCard
-    shares: MetricCard
-    impressions: MetricCard
+  export interface SocialAccount {
+    id: string
+    platform: SocialPlatform
+    username: string
+    followers?: number
+    posts?: number
+    engagementRate?: number
+    lastUpdated: string
   }
-  audienceGrowth: {
-    name: string
-    facebook: number
-    instagram: number
-    linkedin: number
-  }[]
-}
-
-export interface SocialDashboardState {
-  accounts: SocialAccount[]
-  analytics: {
-    overview: OverviewAnalytics | null
-    platforms: {
-      facebook: PlatformAnalyticsData | null
-      instagram: PlatformAnalyticsData | null
-      linkedin: PlatformAnalyticsData | null
+  
+  export interface MetricCard {
+    title: string
+    value: string
+    trend: "up" | "down"
+    change: string
+  }
+  
+  export interface OverviewAnalytics {
+    metrics: {
+      followers: MetricCard
+      engagement: MetricCard
+      shares: MetricCard
+      impressions: MetricCard
+    }
+    audienceGrowth: {
+      name: string
+      facebook: number
+      instagram: number
+      linkedin: number
+      twitter: number
+      youtube: number
+    }[]
+  }
+  
+  export interface PlatformAnalyticsData {
+    metrics: {
+      followers: string
+      engagement: string
+      posts: string
+      reach: string
+    }
+    postPerformance: {
+      name: string
+      value: number
+    }[]
+    topContent: {
+      id: string
+      title: string
+      likes: number
+      comments: number
+    }[]
+    demographics: {
+      ageGroups: {
+        range: string
+        percentage: number
+      }[]
+      gender: {
+        male: number
+        female: number
+      }
     }
   }
-  ui: {
-    loading: {
-      accounts: boolean
-      analytics: boolean
-    }
-    error: string | null
-    selectedPlatform: SocialPlatform | "all"
-  }
-}
-
+  
+  

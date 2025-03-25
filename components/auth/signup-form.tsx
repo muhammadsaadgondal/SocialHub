@@ -8,7 +8,7 @@ import { AccountDetailsForm } from "./account-details-form"
 import { SignUpSuccess } from "./signup-sucess"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import toast from "react-hot-toast"
-import { createUser } from "@/lib/data"
+import { createUser } from "@/lib/user-api"
 
 // Define the steps in the sign-up process
 type SignUpStep = "INITIAL" | "OTP_VERIFICATION" | "ACCOUNT_DETAILS" | "SUCCESS"

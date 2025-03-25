@@ -77,6 +77,8 @@ export function AnalyticsOverview({ overview }: AnalyticsOverviewProps) {
               { key: "facebook", name: "Facebook", color: "#4267B2" },
               { key: "instagram", name: "Instagram", color: "#E1306C" },
               { key: "linkedin", name: "LinkedIn", color: "#0077B5" },
+              { key: "twitter", name: "Twitter", color: "#1DA1F2" },
+              { key: "youtube", name: "YouTube", color: "#FF0000" },
             ]}
           />
         </CardContent>

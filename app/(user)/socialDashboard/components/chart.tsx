@@ -1,8 +1,8 @@
 "use client"
 import {
-  BarChart as RechartsBarChart,
+  BarChart,
   Bar,
-  LineChart as RechartsLineChart,
+  LineChart,
   Line,
   XAxis,
   YAxis,
@@ -14,7 +14,7 @@ import {
 
 interface ChartProps {
   data: any[]
-  height?: number | string
+  height: number
   xAxisKey: string
   series: {
     key: string
@@ -23,65 +23,37 @@ interface ChartProps {
   }[]
 }
 
-export function SimpleLineChart({ data, height = 300, xAxisKey, series }: ChartProps) {
-  if (!data || data.length === 0) {
-    return <div className="flex h-full items-center justify-center p-6 text-muted-foreground">No data available</div>
-  }
-
+export function SimpleLineChart({ data, height, xAxisKey, series }: ChartProps) {
   return (
-    <div style={{ width: "100%", height: height }}>
-      <ResponsiveContainer width="100%" height="100%">
-        <RechartsLineChart
-          data={data}
-          margin={{
-            top: 20,
-            right: 30,
-            left: 20,
-            bottom: 20,
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey={xAxisKey} />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          {series.map((s) => (
-            <Line key={s.key} type="monotone" dataKey={s.key} name={s.name} stroke={s.color} activeDot={{ r: 8 }} />
-          ))}
-        </RechartsLineChart>
-      </ResponsiveContainer>
-    </div>
+    <ResponsiveContainer width="100%" height={height}>
+      <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey={xAxisKey} />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        {series.map((s) => (
+          <Line key={s.key} type="monotone" dataKey={s.key} name={s.name} stroke={s.color} activeDot={{ r: 8 }} />
+        ))}
+      </LineChart>
+    </ResponsiveContainer>
   )
 }
 
-export function SimpleBarChart({ data, height = 300, xAxisKey, series }: ChartProps) {
-  if (!data || data.length === 0) {
-    return <div className="flex h-full items-center justify-center p-6 text-muted-foreground">No data available</div>
-  }
-
+export function SimpleBarChart({ data, height, xAxisKey, series }: ChartProps) {
   return (
-    <div style={{ width: "100%", height: height }}>
-      <ResponsiveContainer width="100%" height="100%">
-        <RechartsBarChart
-          data={data}
-          margin={{
-            top: 20,
-            right: 30,
-            left: 20,
-            bottom: 20,
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey={xAxisKey} />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          {series.map((s) => (
-            <Bar key={s.key} dataKey={s.key} name={s.name} fill={s.color} />
-          ))}
-        </RechartsBarChart>
-      </ResponsiveContainer>
-    </div>
+    <ResponsiveContainer width="100%" height={height}>
+      <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey={xAxisKey} />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        {series.map((s) => (
+          <Bar key={s.key} dataKey={s.key} name={s.name} fill={s.color} />
+        ))}
+      </BarChart>
+    </ResponsiveContainer>
   )
 }
 

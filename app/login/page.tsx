@@ -134,21 +134,7 @@ export default function Page() {
 
                         {errorMessage && <p className="text-red-500 text-sm mb-4">{errorMessage}</p>}
 
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="flex items-center">
-                                <input
-                                    className="hidden"
-                                    type="checkbox"
-                                    id="rememberMe"
-                                    name="rememberflag"
-                                    checked={rememberFlag}
-                                    onChange={() => setRememberFlag(!rememberFlag)}
-                                />
-                                <label className="flex items-center space-x-2 cursor-pointer" htmlFor="rememberMe">
-                                    <span className={`custom-checkbox inline-block w-4 h-4 rounded border ${rememberFlag ? 'bg-purple-600' : 'bg-gray-200'}`}></span>
-                                    <span className="text-sm text-black font-semibold">Remember me</span>
-                                </label>
-                            </div>
+                        <div className="flex items-right justify-between mb-4">
 
                             <Link href="/forgotPassword">
                                 <p className="inline-block align-baseline font-bold text-sm text-purple-600 hover:text-purple-800">Forgot Password?</p>
@@ -165,18 +151,27 @@ export default function Page() {
                             <hr className="flex-grow border-t border-gray-300" />
                         </div>
 
-                   
-                            <div className="flex flex-col justify-evenly gap-4 mb-6">
-                                <Button onClick={async () => await signIn("google")} className="w-full flex items-center justify-center bg-white text-gray-700 border border-gray-300 hover:bg-gray-100 transition duration-300">
-                                    <FcGoogle className="mr-2" size={20} />
-                                    Google
-                                </Button>
-                                <Button onClick={async () => await signIn("facebook")} className="w-full flex items-center justify-center bg-blue-600 text-white hover:bg-blue-700 transition duration-300">
-                                    <FaFacebook className="mr-2" size={20} />
-                                    Facebook
-                                </Button>
-                            </div>
-                        
+
+                        <div className="flex flex-col justify-evenly gap-4 mb-6">
+                            <Button
+                                type="button" // Add this line
+                                onClick={async () => await signIn("google", { callbackUrl: "/home" })}
+                                className="w-full flex items-center justify-center bg-white text-gray-700 border border-gray-300 hover:bg-gray-100 transition duration-300"
+                            >
+                                <FcGoogle className="mr-2" size={20} />
+                                Google
+                            </Button>
+
+                            <Button
+                                type="button" // Add this line
+                                onClick={async () => await signIn("facebook", { callbackUrl: "/home" })}
+                                className="w-full flex items-center justify-center bg-blue-600 text-white hover:bg-blue-700 transition duration-300"
+                            >
+                                <FaFacebook className="mr-2" size={20} />
+                                Facebook
+                            </Button>
+                        </div>
+
                         <div className="sm:hidden w-full text-center">
                             <span className="text-gray-700 font-semibold">Don't have an account? </span>
                             <button onClick={() => { router.push("/signup") }} className="text-purple-600 font-bold hover:text-purple-800 whitespace-nowrap">
@@ -185,7 +180,7 @@ export default function Page() {
                         </div>
                     </form>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }

@@ -1,12 +1,12 @@
 "use client"
 
-import { JSX, useEffect, useState } from "react"
-import { Facebook, Instagram, Linkedin, Loader2 } from "lucide-react"
+import { type JSX, useEffect, useState } from "react"
+import { Facebook, Instagram, Linkedin, Twitter, Youtube, Loader2 } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { SimpleBarChart } from "./chart"
 import type { SocialPlatform, PlatformAnalyticsData } from "@/lib/types"
-import { fetchPlatformAnalytics, fetchComparisonData } from "@/lib/api"
+import { fetchPlatformAnalytics, fetchComparisonData } from "@/lib/social-api"
 
 export function PlatformAnalytics() {
   const [selectedPlatform, setSelectedPlatform] = useState<SocialPlatform | "all">("all")
@@ -14,6 +14,8 @@ export function PlatformAnalytics() {
     facebook: null,
     instagram: null,
     linkedin: null,
+    twitter: null,
+    youtube: null,
   })
   const [comparisonData, setComparisonData] = useState<any[] | null>(null)
   const [loading, setLoading] = useState(false)
@@ -89,6 +91,16 @@ export function PlatformAnalytics() {
       name: "LinkedIn",
       color: "#0077B5",
     },
+    twitter: {
+      icon: <Twitter className="h-5 w-5 text-sky-500" />,
+      name: "Twitter",
+      color: "#1DA1F2",
+    },
+    youtube: {
+      icon: <Youtube className="h-5 w-5 text-red-600" />,
+      name: "YouTube",
+      color: "#FF0000",
+    },
   }
 
   const platformsList = Object.keys(platformInfo) as SocialPlatform[]
@@ -132,7 +144,7 @@ export function PlatformAnalytics() {
         <div className="space-y-6">
           {selectedPlatform === "all" ? (
             <>
-              <div className="grid gap-4 md:grid-cols-3">
+              <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
                 {platformsList.map((p) => (
                   <PlatformCard
                     key={p}
@@ -163,11 +175,11 @@ export function PlatformAnalytics() {
                       data={comparisonData}
                       height={300}
                       xAxisKey="name"
-                      series={[
-                        { key: "facebook", name: "Facebook", color: "#4267B2" },
-                        { key: "instagram", name: "Instagram", color: "#E1306C" },
-                        { key: "linkedin", name: "LinkedIn", color: "#0077B5" },
-                      ]}
+                      series={platformsList.map((p) => ({
+                        key: p,
+                        name: platformInfo[p].name,
+                        color: platformInfo[p].color,
+                      }))}
                     />
                   ) : (
                     <div className="flex justify-center items-center h-[300px]">
@@ -192,7 +204,19 @@ export function PlatformAnalytics() {
   )
 }
 
-function PlatformCard({ platform, icon, name, data, onLoadData }: { platform: SocialPlatform; icon: JSX.Element; name: string; data: PlatformAnalyticsData | null; onLoadData: () => void }) {
+function PlatformCard({
+  platform,
+  icon,
+  name,
+  data,
+  onLoadData,
+}: {
+  platform: SocialPlatform
+  icon: JSX.Element
+  name: string
+  data: PlatformAnalyticsData | null
+  onLoadData: () => void
+}) {
   useEffect(() => {
     if (!data) {
       onLoadData()
@@ -247,7 +271,19 @@ function PlatformCard({ platform, icon, name, data, onLoadData }: { platform: So
   )
 }
 
-function SinglePlatformAnalytics({ platform, data, color, icon, loading }: { platform: SocialPlatform; data: PlatformAnalyticsData | null; color: string; icon: JSX.Element; loading: boolean }) {
+function SinglePlatformAnalytics({
+  platform,
+  data,
+  color,
+  icon,
+  loading,
+}: {
+  platform: SocialPlatform
+  data: PlatformAnalyticsData | null
+  color: string
+  icon: JSX.Element
+  loading: boolean
+}) {
   if (loading || !data) {
     return (
       <div className="flex justify-center items-center py-12">
