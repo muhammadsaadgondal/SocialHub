@@ -4,6 +4,11 @@ export interface IUser extends Document {
   email?: string;
   password?: string; // Make password optional
   username: string;
+  name?: string;
+  bio?: string;
+  website?: string;
+  location?: string;
+  profileImage?: string;
   accountType: "INFLUENCER" | "CAMPAIGN_MANAGER";
   status: string;
   createdAt: Date;
@@ -32,6 +37,15 @@ const UserSchema: Schema = new Schema(
     username: { type: String, required: true,unique:true },
     accountType: { type: String, required: true, enum: ["INFLUENCER", "CAMPAIGN_MANAGER"] },
     status: { type: String, default: "ACTIVE" },
+    name: { type: String },
+    bio: { type: String },
+    website: { type: String },
+    location: { type: String },
+    profileImage: {
+      type: String,
+      default: "/images/default-avatar.png",
+    },
+    
     // OAuth-specific fields
     provider: { type: String }, // e.g., "google"
     providerId: { type: String }, // Unique ID provided by the OAuth provider

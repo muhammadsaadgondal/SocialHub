@@ -362,4 +362,3 @@ export async function deleteUser(userId: string): Promise<void> {
         throw error
     }
 }
-

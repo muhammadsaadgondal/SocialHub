@@ -2,7 +2,7 @@
 import React, { useState, ReactNode, useRef, useEffect } from 'react';
 import { Menu, MessageSquare, Bookmark, PlusCircle, Users, ShoppingBag, BadgePlus, Bell, HelpCircle, Settings, Shield, ChevronLeft, Search, Sun, Grid, User, PencilRuler, HomeIcon, LucideProps, SettingsIcon, Wand, Stamp, AmpersandsIcon, HamIcon, AtomIcon, ActivitySquareIcon, DockIcon, ScanIcon, AlbumIcon, MapIcon } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname,useRouter } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 
 interface LayoutProps {
@@ -10,6 +10,7 @@ interface LayoutProps {
 }
 
 const Layout = ({ children }: LayoutProps) => {
+    const router = useRouter();
     const { data: session } = useSession();
     const [isCollapsed, setIsCollapsed] = useState(true);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -40,6 +41,15 @@ const Layout = ({ children }: LayoutProps) => {
         { title: 'Help Center', icon: HelpCircle, path: '/help-center' },
         { title: 'Settings', icon: Settings, path: '/settings' }
     ];
+    const handleAccountClick = () => {
+        const username=session?.user?.username
+        if (username) {
+            router.push(`/profile/${username}`);
+        } else {
+            console.error("No username found in session");
+        }
+        setIsMenuOpen(false);
+    };
 
     return (
         <div className="flex h-screen bg-gray-100">
@@ -88,7 +98,12 @@ const Layout = ({ children }: LayoutProps) => {
                                 </button>
                                 {isMenuOpen && (
                                     <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg z-30">
-                                        <button className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={() => alert('Navigate to Account page')}>Account</button>
+                                        <button
+                                            className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                                            onClick={handleAccountClick}
+                                        >
+                                            Account
+                                        </button>
                                         <button
                                             className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
                                             onClick={async () => {
