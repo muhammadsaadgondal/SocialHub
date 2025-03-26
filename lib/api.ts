@@ -91,7 +91,7 @@ export async function connectUsernameAccount(platform: SocialPlatform, username:
                 const tiktokData = await axios.get(`http://localhost:3000/api/tiktok-public/${username}`);
                 accountData = {
                     followers: tiktokData.data.followers || 0,
-                    posts: tiktokData.data.posts || 0, // Updated from totalVideos
+                    posts: tiktokData.data.totalVideos || 0,
                     engagementRate: tiktokData.data.engagementRate || 0,
                     followersGrowth: tiktokData.data.followersGrowth || {},
                     recentEngagement: {
