@@ -70,13 +70,6 @@ export function AccountInfo({ user }: AccountInfoProps) {
           value={user.email || "Not specified"} 
         />
 
-        {/* LOCATION */}
-        <DataRow 
-          icon={<MapPinIcon className="w-5 h-5 text-gray-500" />} 
-          label="Location" 
-          value={user.location || "Not specified"} 
-        />
-
         {/* ACCOUNT TYPE */}
         <DataRow 
           icon={<BadgeAlertIcon className="w-5 h-5 text-gray-500" />} 
