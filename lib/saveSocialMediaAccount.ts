@@ -1,16 +1,16 @@
 import SocialMediaAccount from "@/models/SocialMediaAccount";
-import { connectDB,getCurrentUserId } from "@/lib/api";
+import { connectDB, getCurrentUserId } from "@/lib/api";
 import { fetchFacebookData, fetchYoutubeData } from "./fetchData";
 import mongoose from "mongoose";
 
-export const saveSocialAccount = async ( platform: string, accessToken: string) => {
+export const saveSocialAccount = async (platform: string, accessToken: string) => {
   try {
     await connectDB();
 
     // Validate userId
-    const userId= await getCurrentUserId();
+    const userId = await getCurrentUserId();
     try {
-   
+      // Assuming userId is already validated by getCurrentUserId
     } catch (idError) {
       console.error("Error converting userId:", idError);
       throw new Error(`Invalid userId: ${userId}`);
@@ -26,10 +26,12 @@ export const saveSocialAccount = async ( platform: string, accessToken: string) 
       case "youtube-dashboard":
         data = await fetchYoutubeData(accessToken);
         break;
+      default:
+        throw new Error(`Unsupported platform: ${platform}`);
     }
 
     console.log("DATA FINAL:", data);
-    
+
     if (data && platform === "facebook-dashboard") {
       console.log(`SAVING ${platform} DATA`);
       try {
@@ -41,8 +43,14 @@ export const saveSocialAccount = async ( platform: string, accessToken: string) 
           followers: data.facebook.followers || 0,
           posts: data.facebook.posts || 0,
           engagementRate: data.facebook.engagementRate || 0,
+          followersGrowth: data.facebook.followersGrowth || {}, // Week-wise growth
+          recentEngagement: {
+            total: data.facebook.recentEngagement.total || 0,
+            topPosts: data.facebook.recentEngagement.topPosts || []
+          }
         });
         await FbAccount.save();
+
         const instaAccount = new SocialMediaAccount({
           userId,
           platform: "instagram",
@@ -51,11 +59,18 @@ export const saveSocialAccount = async ( platform: string, accessToken: string) 
           followers: data.instagram.followers || 0,
           posts: data.instagram.posts || 0,
           engagementRate: data.instagram.engagementRate || 0,
+          followersGrowth: data.instagram.followersGrowth || {}, // Week-wise growth
+          recentEngagement: {
+            total: data.instagram.recentEngagement.total || 0,
+            topPosts: data.instagram.recentEngagement.topPosts || []
+          }
         });
         await instaAccount.save();
+
         console.log("Facebook account saved:", FbAccount);
+        console.log("Instagram account saved:", instaAccount);
       } catch (error) {
-        console.error("Error saving Facebook account:", error);
+        console.error("Error saving Facebook/Instagram accounts:", error);
         throw error;
       }
     }
@@ -71,11 +86,16 @@ export const saveSocialAccount = async ( platform: string, accessToken: string) 
           followers: data.youtube.subscribers || 0,
           posts: data.youtube.videos || 0,
           engagementRate: data.youtube.engagementRate || 0,
+          followersGrowth: data.youtube.followersGrowth || {}, // Current count + note
+          recentEngagement: {
+            total: data.youtube.recentEngagement.total || 0,
+            topPosts: data.youtube.recentEngagement.topPosts || []
+          }
         });
         await account.save();
         console.log("YouTube account saved:", account);
       } catch (error) {
-        console.error("Error saving YOUTUBE account:", error);
+        console.error("Error saving YouTube account:", error);
         throw error;
       }
     }
@@ -84,8 +104,3 @@ export const saveSocialAccount = async ( platform: string, accessToken: string) 
     throw error;
   }
 };
-
-
-
-
-

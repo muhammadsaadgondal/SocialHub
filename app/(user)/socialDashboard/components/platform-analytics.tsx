@@ -34,6 +34,7 @@ export function PlatformAnalytics() {
       name: "LinkedIn",
       color: "#0077B5",
     },
+
     youtube: {
       icon: <Youtube className="h-5 w-5 text-red-600" />,
       name: "YouTube",

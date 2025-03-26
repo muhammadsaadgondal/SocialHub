@@ -1,69 +1,87 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { SocialAccountsList } from "./social-accounts-list"
-import { ConnectAccountButton } from "./connect-account-button"
-import { AnalyticsOverview } from "./analytics-overview"
-import { PlatformAnalytics } from "./platform-analytics"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Button } from "@/components/ui/button"
-import { Loader2, RefreshCw } from "lucide-react"
-import { fetchSocialAccounts, fetchOverviewAnalytics, refreshSocialData } from "@/lib/api"
-import type { SocialAccount, OverviewAnalytics } from "@/lib/types"
-import toast from "react-hot-toast"
+import { useEffect, useState } from "react";
+import { SocialAccountsList } from "./social-accounts-list";
+import { ConnectAccountButton } from "./connect-account-button";
+import { AnalyticsOverview } from "./analytics-overview";
+import { PlatformAnalytics } from "./platform-analytics";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Loader2, RefreshCw } from "lucide-react";
+import { fetchSocialAccounts, fetchOverviewAnalytics, refreshSocialData } from "@/lib/api";
+import type { SocialAccount, OverviewAnalytics } from "@/lib/types"; // Ensure this matches the updated type
+import toast from "react-hot-toast";
+
+// Update the OverviewAnalytics type to reflect the change from shares to posts
+interface Metric {
+  title: string;
+  value: string;
+  trend: "up" | "down";
+  change: string;
+}
+
+interface UpdatedOverviewAnalytics {
+  metrics: {
+    followers: Metric;
+    engagement: Metric;
+    posts: Metric; // Changed from shares to posts
+    impressions: Metric;
+  };
+  audienceGrowth: Array<{ name: string; [platform: string]: number | string }>;
+}
 
 export default function Dashboard() {
-  const [accounts, setAccounts] = useState<SocialAccount[]>([])
-  const [overview, setOverview] = useState<OverviewAnalytics | null>(null)
-  const [loading, setLoading] = useState({ accounts: false, analytics: false })
-  const [refreshing, setRefreshing] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [accounts, setAccounts] = useState<SocialAccount[]>([]);
+  const [overview, setOverview] = useState<UpdatedOverviewAnalytics | null>(null); // Updated type
+  const [loading, setLoading] = useState({ accounts: false, analytics: false });
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const loadData = async () => {
     try {
-      setLoading((prev) => ({ ...prev, accounts: true }))
-      const accountsData = await fetchSocialAccounts()
-      setAccounts(accountsData)
+      setLoading((prev) => ({ ...prev, accounts: true }));
+      const accountsData = await fetchSocialAccounts();
+      setAccounts(accountsData);
     } catch (err) {
-      setError("Failed to load social accounts")
-      console.error("Error loading accounts:", err)
+      setError("Failed to load social accounts");
+      console.error("Error loading accounts:", err);
     } finally {
-      setLoading((prev) => ({ ...prev, accounts: false }))
+      setLoading((prev) => ({ ...prev, accounts: false }));
     }
 
     try {
-      setLoading((prev) => ({ ...prev, analytics: true }))
-      const overviewData = await fetchOverviewAnalytics()
-      setOverview(overviewData ?? null)
+      setLoading((prev) => ({ ...prev, analytics: true }));
+      const overviewData = await fetchOverviewAnalytics();
+      setOverview(overviewData ?? null);
     } catch (err) {
-      setError("Failed to load analytics overview")
-      console.error("Error loading analytics:", err)
+      setError("Failed to load analytics overview");
+      console.error("Error loading analytics:", err);
     } finally {
-      setLoading((prev) => ({ ...prev, analytics: false }))
+      setLoading((prev) => ({ ...prev, analytics: false }));
     }
-  }
+  };
 
   useEffect(() => {
-    loadData()
-  }, [])
+    loadData();
+  }, []);
 
   const handleRefresh = async () => {
-    setRefreshing(true)
+    setRefreshing(true);
     try {
-      await refreshSocialData()
-      await loadData()
-      toast.success("Social media data refreshed successfully")
+      await refreshSocialData();
+      await loadData();
+      toast.success("Social media data refreshed successfully");
     } catch (err) {
-      toast.error("Failed to refresh social media data")
-      console.error("Error refreshing data:", err)
+      toast.error("Failed to refresh social media data");
+      console.error("Error refreshing data:", err);
     } finally {
-      setRefreshing(false)
+      setRefreshing(false);
     }
-  }
+  };
 
-  const isLoading = loading.accounts || loading.analytics
+  const isLoading = loading.accounts || loading.analytics;
 
   return (
     <div className="w-full min-h-screen">
@@ -89,19 +107,19 @@ export default function Dashboard() {
               />
             </div>
           </div>
-  
+
           {error && (
             <Alert variant="destructive">
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-  
+
           <Tabs defaultValue="analytics" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
               <TabsTrigger value="accounts">Connected Accounts</TabsTrigger>
             </TabsList>
-  
+
             <TabsContent value="analytics" className="space-y-6">
               {loading.analytics ? (
                 <div className="flex justify-center items-center py-12">
@@ -118,7 +136,7 @@ export default function Dashboard() {
                 </>
               )}
             </TabsContent>
-  
+
             <TabsContent value="accounts">
               <Card>
                 <CardHeader>
@@ -143,6 +161,5 @@ export default function Dashboard() {
         </div>
       </main>
     </div>
-  )
+  );
 }
-

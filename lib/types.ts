@@ -115,30 +115,23 @@ export interface Influencer {
     lastUpdated: string
   }
   
-  export interface MetricCard {
-    title: string
-    value: string
-    trend: "up" | "down"
-    change: string
+  export interface Metric {
+    title: string;
+    value: string;
+    trend: "up" | "down";
+    change: string;
   }
-  
+
   export interface OverviewAnalytics {
     metrics: {
-      followers: MetricCard
-      engagement: MetricCard
-      shares: MetricCard
-      impressions: MetricCard
-    }
-    audienceGrowth: {
-      name: string
-      facebook: number
-      instagram: number
-      linkedin: number
-      twitter: number
-      youtube: number
-    }[]
+      followers: Metric;
+      engagement: Metric;
+      posts: Metric; // Replaced shares with posts
+      impressions: Metric;
+    };
+    audienceGrowth: Array<{ name: string; [platform: string]: number | string }>;
   }
-  
+
   export interface PlatformAnalyticsData {
     metrics: {
       followers: string

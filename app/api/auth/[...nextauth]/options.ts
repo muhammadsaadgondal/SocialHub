@@ -3,14 +3,10 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import FacebookProvider from "next-auth/providers/facebook";
 import type { AuthOptions } from "next-auth";
-import TwitterProvider from "next-auth/providers/twitter";
-import LinkedInProvider from "next-auth/providers/linkedin";
-import InstagramProvider from "next-auth/providers/instagram";
 import bcrypt from "bcryptjs";
 import User from "@/models/User";
 import {connectDB} from "@/lib/api";
 import { saveSocialAccount } from "@/lib/saveSocialMediaAccount";
-import { Braces } from "lucide-react";
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -40,6 +36,7 @@ export const authOptions: AuthOptions = {
           if (!isValidPassword) {
             throw new Error("Invalid password");
           }
+          console.log("CREDs ARE OK")
 
           // Return the user object (without the password)
           return { ...user.toObject(), password: undefined };
@@ -67,7 +64,7 @@ export const authOptions: AuthOptions = {
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET!,
       authorization: {
         params: {
-          scope: "public_profile,email",
+          scope: "email,public_profile,email",
         },
       },
     }),
@@ -148,9 +145,7 @@ export const authOptions: AuthOptions = {
                 return "/socialDashboard";
               }
               break;
-    
-            default:
-              return false; // Block sign-in for unsupported platforms
+
           }
     
           return true; // Allow sign-in

@@ -3,7 +3,7 @@
 import { ArrowDown, ArrowUp, Users, MessageSquare, Share2, Eye } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { SimpleLineChart } from "./chart"
-import type { OverviewAnalytics, MetricCard } from "@/lib/types"
+import type { OverviewAnalytics, Metric } from "@/lib/types"
 
 interface AnalyticsOverviewProps {
   overview: OverviewAnalytics | null
@@ -17,11 +17,11 @@ export function AnalyticsOverview({ overview }: AnalyticsOverviewProps) {
   const metrics = [
     overview.metrics.followers,
     overview.metrics.engagement,
-    overview.metrics.shares,
+    overview.metrics.posts,
     overview.metrics.impressions,
   ]
 
-  const getIcon = (metric: MetricCard) => {
+  const getIcon = (metric: Metric) => {
     switch (metric.title) {
       case "Total Followers":
         return Users

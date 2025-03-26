@@ -15,6 +15,7 @@ export default function Page() {
     const [password, setPassword] = useState("");
     const [rememberFlag, setRememberFlag] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     // Load saved credentials on component mount
     useEffect(() => {
@@ -41,44 +42,54 @@ export default function Page() {
     const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setErrorMessage(""); // Reset error message
-
-        // Validate email syntax
-        if (!validateEmail(email)) {
-            toast.error("Please enter a valid email address.");
-            setErrorMessage("Please enter a valid email address.");
-            return;
-        }
-
-        // Validate password length
-        if (!validatePassword(password)) {
-            toast.error("Password must be at least 8 characters long.");
-            setErrorMessage("Password must be at least 8 characters long.");
-            return;
-        }
-
-        // Proceed with sign-in if validation passes
-        const res = await signIn('credentials', {
-            redirect: false,
-            email,
-            password,
-        });
-
-        if (res?.error) {
-            toast.error("Error signing in. Please try again.");
-            setErrorMessage("Incorrect email or password. Please try again.");
-        } else {
-            toast.success("Successfully signed in!");
-
-            // Store credentials if "Remember Me" is checked, otherwise clear them
-            if (rememberFlag) {
-                localStorage.setItem("savedEmail", email);
-                localStorage.setItem("savedPassword", password);
-            } else {
-                localStorage.removeItem("savedEmail");
-                localStorage.removeItem("savedPassword");
+        setIsLoading(true); // Start loading state
+        try {
+            // Validate email syntax
+            if (!validateEmail(email)) {
+                toast.error("Please enter a valid email address.");
+                setErrorMessage("Please enter a valid email address.");
+                setIsLoading(false);
+                return;
             }
 
-            router.push('/home');
+            // Validate password length
+            if (!validatePassword(password)) {
+                toast.error("Password must be at least 8 characters long.");
+                setErrorMessage("Password must be at least 8 characters long.");
+                setIsLoading(false);
+                return;
+            }
+
+            // Proceed with sign-in if validation passes
+            const res = await signIn('credentials', {
+                redirect: false,
+                email,
+                password,
+            });
+
+            if (res?.error) {
+                toast.error("Error signing in. Please try again.");
+                setErrorMessage("Incorrect email or password. Please try again.");
+                setIsLoading(false);
+            } else {
+                toast.success("Successfully signed in!");
+
+                // Store credentials if "Remember Me" is checked, otherwise clear them
+                if (rememberFlag) {
+                    localStorage.setItem("savedEmail", email);
+                    localStorage.setItem("savedPassword", password);
+                } else {
+                    localStorage.removeItem("savedEmail");
+                    localStorage.removeItem("savedPassword");
+                }
+
+                router.push('/home');
+            }
+        } catch (error) {
+            console.error("Login error:", error);
+            toast.error("An unexpected error occurred.");
+            setErrorMessage("An unexpected error occurred.");
+            setIsLoading(false);
         }
     };
 
@@ -142,7 +153,13 @@ export default function Page() {
                         </div>
 
                         <div className="flex items-center justify-between">
-                            <button className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-3xl focus:outline-none focus:shadow-outline" type="submit">Sign In</button>
+                            <button
+                                className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-3xl focus:outline-none focus:shadow-outline"
+                                type="submit"
+                                disabled={isLoading}
+                            >
+                                {isLoading ? 'Logging In...' : 'Sign In'}
+                            </button>
                         </div>
 
                         <div className="flex items-center my-3">
