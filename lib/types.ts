@@ -103,7 +103,7 @@ export interface Influencer {
   }  
 
 
-  export type SocialPlatform = "facebook" | "instagram" | "linkedin" | "twitter" | "youtube"
+  export type SocialPlatform = "facebook" | "instagram" | "linkedin" | "tiktok" | "youtube"
 
   export interface SocialAccount {
     id: string

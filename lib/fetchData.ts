@@ -7,8 +7,8 @@ export const fetchFacebookData = async (access_token: string) => {
 
     // Default return object for both platforms
     const result = {
-      facebook: { followers: 0, posts: 0, engagementRate: 0, totalShares: 0, totalImpressions: 0, followersGrowth: [] },
-      instagram: { followers: 0, posts: 0, reach: 0, engagementRate: 0 }
+      facebook: {  username: '',followers: 0, posts: 0, engagementRate: 0, totalShares: 0, totalImpressions: 0, followersGrowth: [] },
+      instagram: {  username: '',followers: 0, posts: 0, reach: 0, engagementRate: 0 }
     };
 
     // Step 1: Get the user's Facebook pages
@@ -27,16 +27,24 @@ export const fetchFacebookData = async (access_token: string) => {
     const page = facebookResponse.data.data[1];
     const pageId = page.id;
     const pageAccessToken = page.access_token;
-    console.log('Selected Page ID:', pageId, 'with Page Access Token:', pageAccessToken,'Page name: ',page.name);
+    console.log('Selected Page ID:', pageId, 'with Page Access Token:', pageAccessToken, 'Page name: ', page.name);
 
     // Step 3: Get Facebook followers count
     console.log('Fetching Facebook followers...');
     const pageInfoResponse = await axios.get(
       `https://graph.facebook.com/v18.0/${pageId}`,
-      { params: { access_token: pageAccessToken, fields: 'followers_count' } }
+     { params: { 
+          access_token: page.access_token, 
+          fields: 'followers_count,username,name,instagram_business_account{username}' 
+        }}
     );
+    result.facebook.username = pageInfoResponse.data.name || '';
     result.facebook.followers = pageInfoResponse.data?.followers_count || 0;
     console.log('Facebook followers:', result.facebook.followers);
+
+    if (pageInfoResponse.data.instagram_business_account?.username) {
+      result.instagram.username = pageInfoResponse.data.instagram_business_account.username;
+    }
 
     // Step 4: Get Facebook post count
     console.log('Fetching Facebook posts...');
@@ -188,6 +196,7 @@ export const fetchYoutubeData = async (youtubeAccessToken: string) => {
     console.log('Starting fetchYouTubeData with access_token:', youtubeAccessToken);
 
     const result = {
+      username: '',
       subscribers: 0,
       videos: 0,
       totalViews: 0,
@@ -201,7 +210,7 @@ export const fetchYoutubeData = async (youtubeAccessToken: string) => {
       {
         params: {
           access_token: youtubeAccessToken,
-          part: 'id,statistics',
+          part: 'snippet,id,statistics',
           mine: true // Fetches the authenticated user's channel
         }
       }
@@ -212,6 +221,7 @@ export const fetchYoutubeData = async (youtubeAccessToken: string) => {
     }
 
     const channel = channelResponse.data.items[0];
+    result.username = channel.snippet.customUrl?.replace('@', '') || '';
     const channelId = channel.id;
     result.subscribers = parseInt(channel.statistics.subscriberCount || '0');
     result.videos = parseInt(channel.statistics.videoCount || '0');
@@ -264,7 +274,7 @@ export const fetchYoutubeData = async (youtubeAccessToken: string) => {
     }
 
     console.log('Final YouTube data:', result);
-    return result;
+    return { youtube: result };
   } catch (error: any) {
     console.error('Error in fetchYouTubeData:', {
       message: error.message,
@@ -276,90 +286,3 @@ export const fetchYoutubeData = async (youtubeAccessToken: string) => {
 };
 
 
-export const fetchLinkedInData = async (accessToken: string, organizationId: string) => {
-  try {
-    const followersResponse = await axios.get(
-      `https://api.linkedin.com/v2/networkSizes/${organizationId}?edgeType=CompanyFollowedByMember`,
-      {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      }
-    );
-
-    const engagementResponse = await axios.get(
-      `https://api.linkedin.com/v2/organizationalEntityShareStatistics?q=organizationalEntity&organizationalEntity=${organizationId}`,
-      {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      }
-    );
-
-    const totalEngagements = engagementResponse.data.elements.reduce((acc: any, post: { totalShareStatistics: { shareCount: any; commentCount: any; }; }) => {
-      return acc + post.totalShareStatistics.shareCount + post.totalShareStatistics.commentCount;
-    }, 0);
-
-    return {
-      followers: followersResponse.data.firstDegreeSize,
-      posts: engagementResponse.data.elements.length,
-      engagementRate: totalEngagements,
-    };
-  } catch (error) {
-    console.error("Error fetching LinkedIn data:", error);
-    return null;
-  }
-};
-
-
-export const fetchTwitterData = async (bearerToken: string, username: string) => {
-  try {
-    const userResponse = await axios.get(
-      `https://api.twitter.com/2/users/by/username/${username}`,
-      {
-        headers: { Authorization: `Bearer ${bearerToken}` },
-      }
-    );
-
-    const userId = userResponse.data.data.id;
-
-    const statsResponse = await axios.get(
-      `https://api.twitter.com/2/users/${userId}?user.fields=public_metrics`,
-      {
-        headers: { Authorization: `Bearer ${bearerToken}` },
-      }
-    );
-
-    const stats = statsResponse.data.data.public_metrics;
-    return {
-      followers: stats.followers_count,
-      posts: stats.tweet_count,
-      engagementRate: stats.retweet_count + stats.reply_count + stats.like_count,
-    };
-  } catch (error) {
-    console.error("Error fetching Twitter data:", error);
-    return null;
-  }
-};
-
-
-export const fetchInstagramData = async (accessToken: string, instagramId: string) => {
-  try {
-    const response = await axios.get(
-      `https://graph.facebook.com/v18.0/${instagramId}?fields=followers_count,media_count`,
-      { params: { access_token: accessToken } }
-    );
-
-    const insightsResponse = await axios.get(
-      `https://graph.facebook.com/v18.0/${instagramId}/insights?metric=impressions,reach`,
-      { params: { access_token: accessToken } }
-    );
-
-    const totalImpressions = insightsResponse.data.data.find((m: { name: string; }) => m.name === "impressions")?.values[0]?.value || 0;
-
-    return {
-      followers: response.data.followers_count,
-      posts: response.data.media_count,
-      totalImpressions,
-    };
-  } catch (error) {
-    console.error("Error fetching Instagram data:", error);
-    return null;
-  }
-};

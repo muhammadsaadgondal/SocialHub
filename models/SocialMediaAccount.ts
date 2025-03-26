@@ -2,9 +2,9 @@ import mongoose, { Schema, Document } from "mongoose";
 
 export interface ISocialMediaAccount extends Document {
   userId: mongoose.Schema.Types.ObjectId; // Reference to the user
-  platform: "facebook" | "instagram" | "linkedin" | "twitter" | "youtube";
+  platform: "facebook" | "instagram" | "linkedin" | "tiktok" | "youtube";
   handle: string; // Username or handle on the platform
-  accessToken: string; // Access token for the platform
+  accessToken?: string; // Access token for the platform
   refreshToken?: string; // Optional refresh token
   expiresAt?: Date; // Token expiration date
   followers?: number; // Latest follower count
@@ -17,9 +17,9 @@ export interface ISocialMediaAccount extends Document {
 const SocialMediaAccountSchema: Schema = new Schema(
   {
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    platform: { type: String, required: true, enum: ["facebook", "instagram", "linkedin", "twitter", "youtube"] },
+    platform: { type: String, required: true, enum: ["facebook", "instagram", "linkedin", "tiktok", "youtube"] },
     handle: { type: String, required: true },
-    accessToken: { type: String, required: true },
+    accessToken: { type: String },
     refreshToken: { type: String },
     expiresAt: { type: Date },
     followers: { type: Number },

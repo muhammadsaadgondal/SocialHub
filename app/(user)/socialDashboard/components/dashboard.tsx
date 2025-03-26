@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Loader2, RefreshCw } from "lucide-react"
-import { fetchSocialAccounts, fetchOverviewAnalytics, refreshSocialData } from "@/lib/social-api"
+import { fetchSocialAccounts, fetchOverviewAnalytics, refreshSocialData } from "@/lib/api"
 import type { SocialAccount, OverviewAnalytics } from "@/lib/types"
 import toast from "react-hot-toast"
 
@@ -36,7 +36,7 @@ export default function Dashboard() {
     try {
       setLoading((prev) => ({ ...prev, analytics: true }))
       const overviewData = await fetchOverviewAnalytics()
-      setOverview(overviewData)
+      setOverview(overviewData ?? null)
     } catch (err) {
       setError("Failed to load analytics overview")
       console.error("Error loading analytics:", err)
@@ -66,9 +66,9 @@ export default function Dashboard() {
   const isLoading = loading.accounts || loading.analytics
 
   return (
-    <div className="flex min-h-screen flex-col w-full">
-      <main className="flex-1 p-4 md:p-6 lg:p-8">
-        <div className="mx-auto max-w-6xl space-y-6">
+    <div className="w-full min-h-screen">
+      <main className="w-full px-4 md:px-6 lg:px-8">
+        <div className="w-full max-w-full space-y-6">
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Social Dashboard</h1>
@@ -89,19 +89,19 @@ export default function Dashboard() {
               />
             </div>
           </div>
-
+  
           {error && (
             <Alert variant="destructive">
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-
+  
           <Tabs defaultValue="analytics" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
               <TabsTrigger value="accounts">Connected Accounts</TabsTrigger>
             </TabsList>
-
+  
             <TabsContent value="analytics" className="space-y-6">
               {loading.analytics ? (
                 <div className="flex justify-center items-center py-12">
@@ -118,7 +118,7 @@ export default function Dashboard() {
                 </>
               )}
             </TabsContent>
-
+  
             <TabsContent value="accounts">
               <Card>
                 <CardHeader>

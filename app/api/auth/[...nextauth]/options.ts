@@ -8,7 +8,7 @@ import LinkedInProvider from "next-auth/providers/linkedin";
 import InstagramProvider from "next-auth/providers/instagram";
 import bcrypt from "bcryptjs";
 import User from "@/models/User";
-import connectDB from "@/lib/db";
+import {connectDB} from "@/lib/api";
 import { saveSocialAccount } from "@/lib/saveSocialMediaAccount";
 import { Braces } from "lucide-react";
 
@@ -92,87 +92,73 @@ export const authOptions: AuthOptions = {
         },
       },
     }),
-    TwitterProvider({
-      id: "twitter-dashboard",
-      clientId: process.env.TWITTER_CLIENT_ID!,
-      clientSecret: process.env.TWITTER_CLIENT_SECRET!,
-    }),
-    LinkedInProvider({
-      id: "linkedin-dashboard",
-      clientId: process.env.LINKEDIN_CLIENT_ID!,
-      clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
-    }),
   ],
 
   session: { strategy: "jwt" },
 
   callbacks: {
-    async signIn({ user, account, profile }) {
-      try {
-        switch (account?.provider) {
-          case "google":
-          case "facebook":
-            await connectDB();
-            // Find the user by email
-            const existingUser = await User.findOne({ email: user.email });
-            if (existingUser) {
-              // Update the existing user with provider information (if not already set)
-              if (!existingUser.provider) {
-                existingUser.provider = account.provider;
-                existingUser.providerId = account.providerAccountId;
+      async signIn({ user, account, profile }) {
+        try {
+          await connectDB();
+    
+          switch (account?.provider) {
+            case "google":
+            case "facebook":
+            case "facebook-dashboard":
+            case "youtube-dashboard":
+              // Find or create user based on the provider's account ID
+              let existingUser = await User.findOne({ 
+                providerId: account.providerAccountId 
+              });
+    
+              if (!existingUser) {
+                // Create a new user if not exists
+                existingUser = new User({
+                  email: user.email || `${account.providerAccountId}@${account.provider}.com`,
+                  username: user.name || user.email?.split('@')[0] || account.providerAccountId,
+                  accountType: "INFLUENCER",
+                  status: "ACTIVE",
+                  provider: account.provider,
+                  providerId: account.providerAccountId
+                });
+    
                 await existingUser.save();
               }
-
-              // Return the existing user
-              user.id = existingUser._id;
+    
+              // Explicitly set user details
+              user.id = existingUser._id.toString();
               user.username = existingUser.username;
               user.accountType = existingUser.accountType;
-            } else {
-              // Create a new user for third-party sign-in
-              const newUser = new User({
-                email: user.email!,
-                username: user.email!.split("@")[0] || user.name,
-                accountType: "INFLUENCER", // Default role for third-party sign-in
-                status: "ACTIVE",
-                provider: account.provider, // Store the provider
-                providerId: account.providerAccountId, // Store the provider ID
-              });
-
-              // Save the new user
-              await newUser.save();
-
-              // Return the new user
-              user.id = newUser._id;
-              user.username = newUser.username;
-              user.accountType = newUser.accountType;
-            }
-            break;
-
-          case "facebook-dashboard":
-          case "twitter-dashboard":
-          case "youtube-dashboard":
-          case "linkedin-dashboard":
-          case "instagram-dashboard":
-            console.log("ACCOUNT DATA: ", account)
-            if (account.access_token) {
-              await saveSocialAccount(user.id, account.provider, account.access_token);
-            } else {
-              throw new Error("Access token is undefined");
-            }
-            // Redirect to the test page after saving
-            return "/authTest";
-            break;
-
-          default:
-            return false; // Block sign-in for unsupported platforms
+    
+              // Handle social media account saving for dashboard providers
+              if (account.provider === "facebook-dashboard" || account.provider === "youtube-dashboard") {
+                console.log("ACCOUNT DATA: ", account);
+                console.log("USER OBJECT BEFORE SAVE: ", user);
+                
+                if (account.access_token) {
+                  // Use the user's MongoDB _id, not the provider's account ID
+                  const userIdToSave = existingUser._id.toString();
+                  console.log("Passing userID as string:", userIdToSave);
+                  
+                  await saveSocialAccount( account.provider, account.access_token);
+                } else {
+                  throw new Error("Access token is undefined");
+                }
+                
+                return "/socialDashboard";
+              }
+              break;
+    
+            default:
+              return false; // Block sign-in for unsupported platforms
+          }
+    
+          return true; // Allow sign-in
+        } catch (error) {
+          console.error("Error during sign-in:", error);
+          return false; // Block sign-in
         }
-
-        return true; // Allow sign-in
-      } catch (error) {
-        console.error("Error during sign-in:", error);
-        return false; // Block sign-in
-      }
-    },
+      },
 
     async jwt({ token, user }) {
       if (user) {

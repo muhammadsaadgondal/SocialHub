@@ -79,6 +79,7 @@ export function AnalyticsOverview({ overview }: AnalyticsOverviewProps) {
               { key: "linkedin", name: "LinkedIn", color: "#0077B5" },
               { key: "twitter", name: "Twitter", color: "#1DA1F2" },
               { key: "youtube", name: "YouTube", color: "#FF0000" },
+              { key: "tiktok", name: "TikTok", color: "#000000" },
             ]}
           />
         </CardContent>

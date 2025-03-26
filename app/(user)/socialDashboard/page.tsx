@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-// import Dashboard from "./components/dashboard"
+import Dashboard from "./components/dashboard"
 
 export const metadata: Metadata = {
   title: "Social Media Dashboard",
@@ -7,6 +7,6 @@ export const metadata: Metadata = {
 }
 
 export default function DashboardPage() {
-  // return <Dashboard />
+  return <Dashboard />
 }
 
