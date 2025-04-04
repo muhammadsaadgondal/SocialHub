@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
 
-export const fetchLinkedInDataWithRapidAPI = async (linkedinUrl: string, rapidApiKey: string) => {
+const fetchLinkedInDataWithRapidAPI = async (linkedinUrl: string, rapidApiKey: string) => {
   try {
     console.log(`Fetching LinkedIn data for ${linkedinUrl}...`);
 
@@ -138,7 +138,7 @@ export const fetchLinkedInDataWithRapidAPI = async (linkedinUrl: string, rapidAp
   }
 };
 
-export async function GET(request: Request, context: { params: Promise<{ username: string }> | { username: string } }) {
+export async function GET(request: Request, context: { params: Promise<{ username: string }>  }) {
   try {
     const params = await (context.params as Promise<{ username: string }>) || context.params;
     const { username } = params;

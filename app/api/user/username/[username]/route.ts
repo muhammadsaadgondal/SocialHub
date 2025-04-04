@@ -2,9 +2,9 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getUserProfileByUsername } from "@/lib/user-controller";
 
 // GET a specific user by username
-export async function GET(request: NextRequest, { params }: { params: { username: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ username: string }> }) {
   try {
-    const username = params.username;
+    const {username} = await params;
     const user = await getUserProfileByUsername(username);
 
     if (!user) {
@@ -13,7 +13,7 @@ export async function GET(request: NextRequest, { params }: { params: { username
 
     return NextResponse.json(user);
   } catch (error) {
-    console.error(`Error in GET /api/users/username/${params.username}:`, error);
+    console.error(`Error in GET /api/users/username/${(await params).username}:`, error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

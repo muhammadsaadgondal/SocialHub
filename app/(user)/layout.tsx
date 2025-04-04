@@ -41,6 +41,12 @@ const Layout = ({ children }: LayoutProps) => {
         { title: 'Help Center', icon: HelpCircle, path: '/help-center' },
         { title: 'Settings', icon: Settings, path: '/settings' }
     ];
+
+    if (session?.user?.accountType === 'CAMPAIGN_MANAGER') {
+        menuItems.splice(1, 0, { title: 'Explore', icon: Users, path: '/explore' });
+    }
+
+    console.log(session?.user.accountType);
     const handleAccountClick = () => {
         const username=session?.user?.username
         if (username) {

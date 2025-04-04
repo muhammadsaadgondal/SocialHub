@@ -32,7 +32,7 @@ export const saveSocialAccount = async (platform: string, accessToken: string) =
 
     console.log("DATA FINAL:", data);
 
-    if (data && platform === "facebook-dashboard") {
+    if (data && platform === "facebook-dashboard" && "facebook" in data ) {
       console.log(`SAVING ${platform} DATA`);
       try {
         const FbAccount = new SocialMediaAccount({
@@ -75,7 +75,7 @@ export const saveSocialAccount = async (platform: string, accessToken: string) =
       }
     }
 
-    if (data && platform === "youtube-dashboard") {
+    if (data && platform === "youtube-dashboard" && "youtube" in data) {
       console.log(`SAVING ${platform} DATA`);
       try {
         const account = new SocialMediaAccount({

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
 
-export const fetchTikTokDataWithRapidAPI = async (username: string, rapidApiKey: string) => {
+const fetchTikTokDataWithRapidAPI = async (username: string, rapidApiKey: string) => {
   try {
     console.log(`Fetching TikTok data for @${username}...`);
 
@@ -29,8 +29,8 @@ export const fetchTikTokDataWithRapidAPI = async (username: string, rapidApiKey:
     };
 
     // Calculate engagement rate
-    result.engagementRate = result.followers > 0 
-      ? (result.totalLikes / result.followers) * 100 
+    result.engagementRate = result.followers > 0
+      ? (result.totalLikes / result.followers) * 100
       : 0;
 
     console.log('Final result:', result);
@@ -46,14 +46,15 @@ export const fetchTikTokDataWithRapidAPI = async (username: string, rapidApiKey:
 
 
 // Keep the GET function the same
-export async function GET(request: Request, { params }: { params: { username: string } }) {
+export async function GET(request: Request, context: { params: Promise<{ username: string }> }) {
   try {
+    const params = await (context.params as Promise<{ username: string }>) || context.params;
     const { username } = params;
     const rapidApiKey = process.env.RAPIDAPI_KEY;
-    
+
     if (!username || !rapidApiKey) {
       return NextResponse.json(
-        { error: 'Missing username or API key' }, 
+        { error: 'Missing username or API key' },
         { status: 400 }
       );
     }

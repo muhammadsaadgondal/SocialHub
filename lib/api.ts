@@ -431,67 +431,69 @@ export async function fetchPlatformAnalytics(platform: SocialPlatform): Promise<
     }
 }
 
-export async function fetchPlatformAnalyticsOriginal(platform: SocialPlatform): Promise<PlatformAnalyticsData | undefined> {
-    try {
-      await connectDB();
-      const userId = await getCurrentUserId();
+// export async function fetchPlatformAnalyticsOriginal(platform: SocialPlatform): Promise<PlatformAnalyticsData | undefined> {
+//     try {
+//       await connectDB();
+//       const userId = await getCurrentUserId();
   
-      const account = await SocialMediaAccount.findOne({ userId, platform });
+//       const account = await SocialMediaAccount.findOne({ userId, platform });
   
-      if (!account) {
-        console.log(`No ${platform} account found`);
-        return undefined;
-      }
+//       if (!account) {
+//         console.log(`No ${platform} account found`);
+//         return undefined;
+//       }
   
-      // Generate post performance data from recentEngagement (last 6 days)
-      const postPerformance = Array.from({ length: 7 }, (_, i) => {
-        const day = new Date();
-        day.setDate(day.getDate() - 6 + i);
-        const dayName = day.toLocaleDateString("en-US", { weekday: "short" });
+//       // Generate post performance data from recentEngagement (last 6 days)
+//       const postPerformance = Array.from({ length: 7 }, (_, i) => {
+//         const day = new Date();
+//         day.setDate(day.getDate() - 6 + i);
+//         const dayName = day.toLocaleDateString("en-US", { weekday: "short" });
   
-        // Sum engagement for posts on this day
-        const dailyEngagement = (account.recentEngagement?.topPosts || [])
-          .filter((post: { timestamp: string | number | Date }) => {
-            const postDate = new Date(post.timestamp);
-            return (
-              postDate.getDate() === day.getDate() &&
-              postDate.getMonth() === day.getMonth() &&
-              postDate.getFullYear() === day.getFullYear()
-            );
-          })
-          .reduce((sum: any, post: { engagement: any }) => sum + (post.engagement || 0), 0);
+//         // Sum engagement for posts on this day
+//         const dailyEngagement = (account.recentEngagement?.topPosts || [])
+//           .filter((post: { timestamp: string | number | Date }) => {
+//             const postDate = new Date(post.timestamp);
+//             return (
+//               postDate.getDate() === day.getDate() &&
+//               postDate.getMonth() === day.getMonth() &&
+//               postDate.getFullYear() === day.getFullYear()
+//             );
+//           })
+//           .reduce((sum: any, post: { engagement: any }) => sum + (post.engagement || 0), 0);
   
-        return {
-          name: dayName,
-          value: dailyEngagement,
-        };
-      });
+//         return {
+//           name: dayName,
+//           value: dailyEngagement,
+//         };
+//       });
   
-      // Use top posts from recentEngagement
-      const topContent = (account.recentEngagement?.topPosts || []).slice(0, 3).map((post: { id: any; text: any; caption: any; engagement: any }) => ({
-        id: post.id || `post-${Math.random().toString(36).substr(2, 9)}`,
-        title: post.text || post.caption || "Untitled Post", // Use text (LinkedIn) or caption (others)
-        likes: post.engagement || 0, // Engagement is likes for most platforms
-        comments: 0, // Placeholder; not available in current data
-      }));
+//       // Use top posts from recentEngagement
+//       const topContent = (account.recentEngagement?.topPosts || []).slice(0, 3).map((post: { id: any; text: any; caption: any; engagement: any }) => ({
+//         id: post.id || `post-${Math.random().toString(36).substr(2, 9)}`,
+//         title: post.text || post.caption || "Untitled Post", // Use text (LinkedIn) or caption (others)
+//         likes: post.engagement || 0, // Engagement is likes for most platforms
+//         comments: 0, // Placeholder; not available in current data
+//       }));
   
-      return {
-        metrics: {
-          followers: account.followers?.toLocaleString() || "0",
-          engagement: `${account.engagementRate?.toFixed(2) || "0"}%`,
-          posts: account.posts?.toString() || "0",
-          reach: Math.floor((account.followers || 0) * (account.engagementRate || 0) / 100).toLocaleString(), // Estimated
-        },
-        postPerformance,
-        topContent,
-      };
-    } catch (error) {
-      console.error("Error fetching platform analytics:", error);
-      return undefined;
-    }
-  }
+//       return {
+//         metrics: {
+//           followers: account.followers?.toLocaleString() || "0",
+//           engagement: `${account.engagementRate?.toFixed(2) || "0"}%`,
+//           posts: account.posts?.toString() || "0",
+//           reach: Math.floor((account.followers || 0) * (account.engagementRate || 0) / 100).toLocaleString(), // Estimated
+//         },
+//         postPerformance,
+//         topContent,
+//       };
+//     } catch (error) {
+//       console.error("Error fetching platform analytics:", error);
+//       return undefined;
+//     }
+//   }
 
 // Fetch comparison data for all platforms
+
+
 export async function fetchComparisonData(): Promise<any[]> {
     try {
         await connectDB()

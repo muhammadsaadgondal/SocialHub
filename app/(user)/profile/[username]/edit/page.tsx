@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getUserByUsername } from "@/lib/user-service";
 import { EditProfileForm } from "./../../components/profile/edit-profile-form";
+import { use } from "react";
 
 interface EditProfilePageProps {
   params: {
@@ -8,13 +9,13 @@ interface EditProfilePageProps {
   };
 }
 
-export default async function EditProfilePage({ params }: EditProfilePageProps) {
-  const { username } = params;
+export default function EditProfilePage({ params }: { params: Promise<EditProfilePageProps> }) {
+  const { username } = use(params).params;
 
   console.log("📩 Received username:", username);
 
   // Fetch the Mongoose document
-  const userDoc = await getUserByUsername(username);
+  const userDoc = getUserByUsername(username);
 
   if (!userDoc) {
     console.warn("🚫 User not found:", username);

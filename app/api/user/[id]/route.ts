@@ -3,9 +3,9 @@ import { getUserById, updateUser, getUserByUsername, isValidObjectId } from "@/l
 import type { IUser } from "@/models/User"; // Ensure User type is imported
 
 // GET a specific user by ID
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string } >}) {
   try {
-    const id = params.id;
+    const id = (await params).id;
     const user = await getUserById(id);
 
     if (!user) {
@@ -14,15 +14,15 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
     return NextResponse.json(user);
   } catch (error) {
-    console.error(`Error in GET /api/users/${params.id}:`, error);
+    console.error(`Error in GET /api/users/${(await params).id}:`, error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
 
 // PUT - Update a user (full replace)
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const id = params.id;
+    const {id} = await params;
     const userData = await request.json();
 
     // Check if user exists
@@ -58,15 +58,15 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       user: result,
     });
   } catch (error) {
-    console.error(`Error in PUT /api/users/${params.id}:`, error);
+    console.error(`Error in PUT /api/users/${(await params).id}:`, error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
 
 // PATCH - Partially update a user
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     // Validate if the id is a valid MongoDB ObjectId
     if (!id || !isValidObjectId(id)) {

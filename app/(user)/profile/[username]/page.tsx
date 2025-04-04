@@ -4,15 +4,14 @@ import { ProfileHeader } from "./../components/profile-header";
 import { AccountInfo } from "./../components/account-info";
 import { SocialMedia } from "./../components/social-media";
 import { formatDate } from "@/lib/utils";
+import { use } from "react";
 
 interface ProfilePageProps {
-  params: {
     username: string;
-  };
 }
 
-export default async function ProfilePage({ params }: ProfilePageProps) {
-  const { username } = params;
+export default async function ProfilePage({ params }: { params: Promise<ProfilePageProps> }) {
+  const { username } = use(params);
 
   // Call getUserProfile with the username argument.
   const user = await getUserProfile(username);

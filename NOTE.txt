@@ -1,0 +1,9 @@
+THESE API KEYS AND CLIENT IDS are obtained by me by linking my accounts. They have certain limits like number of requests per second and month and if they are used more than that on free trial are chanrged.
+
+Plus for the facebook login and info getting they ClientId and secret is in developer mode which means only the tester accounts can be tested and used to login.
+
+You need to get your own APIs and CLIENTIds--->( Or provide me detail and I'll configure for you)
+
+#1 facebook dev portal for facebook and insta
+#2 google portal for youtube
+#3 RAPID API for tiktok and linkedin
